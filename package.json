@@ -1,0 +1,21 @@
+{
+  "name": "portfolio",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.15",
+    "copy-webpack-plugin": "^10.2.4",
+    "vite": "^2.7.2"
+  },
+  "dependencies": {
+    "ammo.js": "0.0.10",
+    "physijs": "^1.0.4",
+    "three": "^0.137.5",
+    "three-orbit-controls": "^82.1.0",
+    "webpack": "^5.68.0"
+  }
+}
