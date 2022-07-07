@@ -5,6 +5,10 @@ import "./style.css";
 import * as THREE from "three";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import SplineLoader from '@splinetool/loader';
+
+// import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.118.1/examples/jsm/loaders/GLTFLoader.js";
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 // import { Physijs } from "physijs";
 // var Physijs = require("/js/physi.js")(THREE, Ammo);
@@ -662,22 +666,23 @@ class World {
 
   _Initialize() {
     //ammo code.........
-    this.collisionConfiguration_ = new Ammo.btDefaultCollisionConfiguration();
-    this.dispatcher_ = new Ammo.btCollisionDispatcher(
-      this.collisionConfiguration_
-    );
-    this.broadphase_ = new Ammo.btDbvtBroadphase();
-    this.solver_ = new Ammo.btSequentialImpulseConstraintSolver();
-    this.physicsWorld_ = new Ammo.btDiscreteDynamicsWorld(
-      this.dispatcher_,
-      this.broadphase_,
-      this.solver_,
-      this.collisionConfiguration_
-    );
-    this.physicsWorld_.setGravity(new Ammo.btVector3(0, -100, 0));
+    // this.collisionConfiguration_ = new Ammo.btDefaultCollisionConfiguration();
+    // this.dispatcher_ = new Ammo.btCollisionDispatcher(
+    //   this.collisionConfiguration_
+    // );
+    // this.broadphase_ = new Ammo.btDbvtBroadphase();
+    // this.solver_ = new Ammo.btSequentialImpulseConstraintSolver();
+    // this.physicsWorld_ = new Ammo.btDiscreteDynamicsWorld(
+    //   this.dispatcher_,
+    //   this.broadphase_,
+    //   this.solver_,
+    //   this.collisionConfiguration_
+    // );
+    // this.physicsWorld_.setGravity(new Ammo.btVector3(0, -100, 0));
 
     //..................
     this._threejs = new THREE.WebGLRenderer({ antialias: true });
+
     this._threejs.outputEncoding = THREE.sRGBEncoding;
     this._threejs.shadowMap.enabled = true;
     this._threejs.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -781,9 +786,29 @@ class World {
     box.position.set(35, 10, 20);
 
     // var x = new THREE.BoundingBoxHelper(box);
-    console.log(box);
 
-    this._scene.add(box);
+    //loading gltf models?
+    // const loader = new GLTFLoader();
+    // loader.load('./resources/objects/Rocket_Ship_01.gltf',(gltf)=>{
+    //   gltf.scene.position.set(35, 10, 20);
+    //   gltf.scene.traverse(c=>{
+    //     c.castShadow = true;
+    //   });
+    //   console.log(gltf);
+    //   this._scene.add(gltf.scene);
+    // });
+
+    const loader = new SplineLoader();
+    loader.load(
+      'https://prod.spline.design/oFa6OpS1OjAuYO2c/scene.splinecode',
+      (splineScene) => {
+        console.log(splineScene);
+        this._scene.add(splineScene);
+      }
+    );
+
+
+    // this._scene.add(box);
   }
 
   _LoadAnimatedModel() {
@@ -878,18 +903,18 @@ class World {
       this._controls.Update(timeElapsedS);
     }
     //ammo code......
-    this.physicsWorld_.stepSimulation(timeElapsedS, 10);
+    // this.physicsWorld_.stepSimulation(timeElapsedS, 10);
   }
 }
 
 let _APP = null;
 
-window.addEventListener("DOMContentLoaded", async () => {
-  Ammo().then((lib) => {
-    Ammo = lib;
-    _APP = new World();
-  });
+// window.addEventListener("DOMContentLoaded", async () => {
+//   Ammo().then((lib) => {
+//     Ammo = lib;
+//     _APP = new World();
+//   });
 
   //old code
-  // _APP = new World();
-});
+  _APP = new World();
+// });
