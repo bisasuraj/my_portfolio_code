@@ -1,14 +1,14 @@
 // "use strict";
 
 import "./style.css";
-// import three from 'https://cdn.skypack.dev/three';
-import * as THREE from "three";
+import * as THREE from 'three';
+// import * as THREE from "three";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import SplineLoader from '@splinetool/loader';
 
 // import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.118.1/examples/jsm/loaders/GLTFLoader.js";
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+// import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 // import { Physijs } from "physijs";
 // var Physijs = require("/js/physi.js")(THREE, Ammo);
