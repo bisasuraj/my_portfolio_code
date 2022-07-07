@@ -13,8 +13,6 @@
   },
   "dependencies": {
     "@splinetool/loader": "^0.9.73",
-    "ammo.js": "0.0.10",
-    "physijs": "^1.0.4",
     "three": "^0.137.5",
     "three-orbit-controls": "^82.1.0",
     "webpack": "^5.68.0"
