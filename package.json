@@ -1,6 +1,7 @@
 {
   "name": "portfolio",
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -9,7 +10,7 @@
   "devDependencies": {
     "@types/node": "^17.0.15",
     "copy-webpack-plugin": "^10.2.4",
-    "vite": "^2.7.2"
+    "vite": "^2.9.14"
   },
   "dependencies": {
     "@splinetool/loader": "^0.9.73",

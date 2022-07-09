@@ -1,11 +1,11 @@
 // "use strict";
 
 import "./style.css";
-import * as THREE from 'three';
-// import * as THREE from "three";
+import * as THREE from "three";
+// // import * as THREE from "three";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import SplineLoader from '@splinetool/loader';
+import SplineLoader from "@splinetool/loader";
 
 // import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.118.1/examples/jsm/loaders/GLTFLoader.js";
 // import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -800,13 +800,12 @@ class World {
 
     const loader = new SplineLoader();
     loader.load(
-      'https://prod.spline.design/oFa6OpS1OjAuYO2c/scene.splinecode',
+      "https://prod.spline.design/oFa6OpS1OjAuYO2c/scene.splinecode",
       (splineScene) => {
         console.log(splineScene);
         this._scene.add(splineScene);
       }
     );
-
 
     // this._scene.add(box);
   }
@@ -915,6 +914,6 @@ let _APP = null;
 //     _APP = new World();
 //   });
 
-  //old code
-  _APP = new World();
+//old code
+_APP = new World();
 // });
