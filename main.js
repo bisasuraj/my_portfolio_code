@@ -7,8 +7,15 @@ import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import SplineLoader from "@splinetool/loader";
 
+// import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js";
+
+// import { FBXLoader } from "https://cdn.jsdelivr.net/npm/three@0.118.1/examples/jsm/loaders/FBXLoader.js";
+// // import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.118.1/examples/jsm/loaders/GLTFLoader.js";
+// import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.118/examples/jsm/controls/OrbitControls.js";
+
+// import * as SplineLoader from "https://cdn.jsdelivr.net/npm/@splinetool/loader@0.9.75/build/SplineLoader.min.js";
+
 // import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.118.1/examples/jsm/loaders/GLTFLoader.js";
-// import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 // import { Physijs } from "physijs";
 // var Physijs = require("/js/physi.js")(THREE, Ammo);
