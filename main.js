@@ -1,11 +1,16 @@
 // "use strict";
 
-// import "./style.css";
+import "./style.css";
 import * as THREE from "three";
 // // import * as THREE from "three";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import SplineLoader from "@splinetool/loader";
+// import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+// import SplineLoader from "@splinetool/loader";
+
+import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry";
+
+import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
+// import threeOrbitControls from "three-orbit-controls";
 
 // import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js";
 
@@ -58,22 +63,23 @@ class BasicCharacterController {
     this._Init(params);
   }
 
-  intersect(sphere, spradius, other, obradius) {
-    // we are using multiplications because it's faster than calling Math.pow
-    var distance = Math.sqrt(
-      (sphere.x - other.x) * (sphere.x - other.x) +
-        (sphere.y - other.y) * (sphere.y - other.y) +
-        (sphere.z - other.z) * (sphere.z - other.z)
-    );
-    console.log(distance);
-    return distance < spradius + obradius;
-  }
+  // intersect(sphere, spradius, other, obradius) {
+  //   // we are using multiplications because it's faster than calling Math.pow
+  //   var distance = Math.sqrt(
+  //     (sphere.x - other.x) * (sphere.x - other.x) +
+  //       (sphere.y - other.y) * (sphere.y - other.y) +
+  //       (sphere.z - other.z) * (sphere.z - other.z)
+  //   );
+  //   console.log(distance);
+  //   return distance < spradius + obradius;
+  // }
 
   _Init(params) {
     this._params = params;
     this._decceleration = new THREE.Vector3(-0.0005, -0.0001, -5.0);
     this._acceleration = new THREE.Vector3(1, 0.25, 50.0);
     this._velocity = new THREE.Vector3(0, 0, 0);
+    this._position = new THREE.Vector3();
 
     this._animations = {};
     this._input = new BasicCharacterControllerInput();
@@ -132,8 +138,19 @@ class BasicCharacterController {
     });
   }
 
-  Update(timeInSeconds) {
+  get Position() {
+    return this._position;
+  }
+
+  get Rotation() {
     if (!this._target) {
+      return new THREE.Quaternion();
+    }
+    return this._target.quaternion;
+  }
+
+  Update(timeInSeconds) {
+    if (!this._stateMachine._currentState) {
       return;
     }
 
@@ -158,9 +175,8 @@ class BasicCharacterController {
     const _R = controlObject.quaternion.clone();
 
     const acc = this._acceleration.clone();
-
     if (this._input._keys.shift) {
-      acc.multiplyScalar(2.0);
+      acc.multiplyScalar(5.0);
     }
 
     if (this._stateMachine._currentState.Name == "dance") {
@@ -168,30 +184,6 @@ class BasicCharacterController {
     }
 
     if (this._input._keys.forward) {
-      // console.log(this);
-
-      //coordinates of character
-      // var charHC = new THREE.BoxHelper(this._target);
-      // charHC.update(this._target);
-      // console.log(charHC);
-
-      // var firstBB = new THREE.Box3().setFromObject(this._target);
-
-      // console.log(firstBB);
-
-      // //coordinates of a box
-
-      // var secondBB = new THREE.Box3().setFromObject(
-      //   this._params.scene.children[3]
-      // );
-
-      //detect collision
-      //https://stackify.dev/445297-how-to-detect-collision-between-two-objects-in-javascript-with-three-js
-      // var collision = firstBB.intersectsBox(secondBB);
-      // if (firstBB.intersectsBox(secondBB)) {
-      //   console.log("whoaaa watchout");
-      // }
-
       velocity.z += acc.z * timeInSeconds;
     }
     if (this._input._keys.backward) {
@@ -201,7 +193,7 @@ class BasicCharacterController {
       _A.set(0, 1, 0);
       _Q.setFromAxisAngle(
         _A,
-        4.0 * Math.PI * timeInSeconds * this._acceleration.y
+        2.0 * Math.PI * timeInSeconds * this._acceleration.y
       );
       _R.multiply(_Q);
     }
@@ -209,7 +201,7 @@ class BasicCharacterController {
       _A.set(0, 1, 0);
       _Q.setFromAxisAngle(
         _A,
-        4.0 * -Math.PI * timeInSeconds * this._acceleration.y
+        2.0 * -Math.PI * timeInSeconds * this._acceleration.y
       );
       _R.multiply(_Q);
     }
@@ -233,7 +225,7 @@ class BasicCharacterController {
     controlObject.position.add(forward);
     controlObject.position.add(sideways);
 
-    oldPosition.copy(controlObject.position);
+    this._position.copy(controlObject.position);
 
     if (this._mixer) {
       this._mixer.update(timeInSeconds);
@@ -542,127 +534,43 @@ class IdleState extends State {
   }
 }
 
-class BasicCharacterControllerDemo {
+class ThirdPersonCamera {
   constructor(params) {
-    this._Init(params);
-  }
-
-  _Init(params) {
     this._params = params;
-    this._move = {
-      forward: false,
-      backward: false,
-      left: false,
-      right: false,
-    };
-    this._decceleration = new THREE.Vector3(-0.0005, -0.0001, -5.0);
-    this._acceleration = new THREE.Vector3(1, 0.25, 50.0);
-    this._velocity = new THREE.Vector3(0, 0, 0);
+    this._camera = params.camera;
 
-    document.addEventListener("keydown", (e) => this._onKeyDown(e), false);
-    document.addEventListener("keyup", (e) => this._onKeyUp(e), false);
+    this._currentPosition = new THREE.Vector3();
+    this._currentLookat = new THREE.Vector3();
   }
 
-  _onKeyDown(event) {
-    switch (event.keyCode) {
-      case 87: // w
-        this._move.forward = true;
-        break;
-      case 65: // a
-        this._move.left = true;
-        break;
-      case 83: // s
-        this._move.backward = true;
-        break;
-      case 68: // d
-        this._move.right = true;
-        break;
-      case 38: // up
-      case 37: // left
-      case 40: // down
-      case 39: // right
-        break;
-    }
+  _CalculateIdealOffset() {
+    const idealOffset = new THREE.Vector3(-15, 17, -26);
+    idealOffset.applyQuaternion(this._params.target.Rotation);
+    idealOffset.add(this._params.target.Position);
+    return idealOffset;
   }
 
-  _onKeyUp(event) {
-    switch (event.keyCode) {
-      case 87: // w
-        this._move.forward = false;
-        break;
-      case 65: // a
-        this._move.left = false;
-        break;
-      case 83: // s
-        this._move.backward = false;
-        break;
-      case 68: // d
-        this._move.right = false;
-        break;
-      case 38: // up
-      case 37: // left
-      case 40: // down
-      case 39: // right
-        break;
-    }
+  _CalculateIdealLookat() {
+    const idealLookat = new THREE.Vector3(0, 10, 50);
+
+    idealLookat.applyQuaternion(this._params.target.Rotation);
+    idealLookat.add(this._params.target.Position);
+    return idealLookat;
   }
 
-  Update(timeInSeconds) {
-    const velocity = this._velocity;
-    const frameDecceleration = new THREE.Vector3(
-      velocity.x * this._decceleration.x,
-      velocity.y * this._decceleration.y,
-      velocity.z * this._decceleration.z
-    );
-    frameDecceleration.multiplyScalar(timeInSeconds);
-    frameDecceleration.z =
-      Math.sign(frameDecceleration.z) *
-      Math.min(Math.abs(frameDecceleration.z), Math.abs(velocity.z));
+  Update(timeElapsed) {
+    const idealOffset = this._CalculateIdealOffset();
+    const idealLookat = this._CalculateIdealLookat();
 
-    velocity.add(frameDecceleration);
+    // const t = 0.05;
+    // const t = 4.0 * timeElapsed;
+    const t = 1.0 - Math.pow(0.001, timeElapsed);
 
-    const controlObject = this._params.target;
-    const _Q = new THREE.Quaternion();
-    const _A = new THREE.Vector3();
-    const _R = controlObject.quaternion.clone();
+    this._currentPosition.lerp(idealOffset, t);
+    this._currentLookat.lerp(idealLookat, t);
 
-    if (this._move.forward) {
-      velocity.z += this._acceleration.z * timeInSeconds;
-    }
-    if (this._move.backward) {
-      velocity.z -= this._acceleration.z * timeInSeconds;
-    }
-    if (this._move.left) {
-      _A.set(0, 1, 0);
-      _Q.setFromAxisAngle(_A, Math.PI * timeInSeconds * this._acceleration.y);
-      _R.multiply(_Q);
-    }
-    if (this._move.right) {
-      _A.set(0, 1, 0);
-      _Q.setFromAxisAngle(_A, -Math.PI * timeInSeconds * this._acceleration.y);
-      _R.multiply(_Q);
-    }
-
-    controlObject.quaternion.copy(_R);
-
-    const oldPosition = new THREE.Vector3();
-    oldPosition.copy(controlObject.position);
-
-    const forward = new THREE.Vector3(0, 0, 1);
-    forward.applyQuaternion(controlObject.quaternion);
-    forward.normalize();
-
-    const sideways = new THREE.Vector3(1, 0, 0);
-    sideways.applyQuaternion(controlObject.quaternion);
-    sideways.normalize();
-
-    sideways.multiplyScalar(velocity.x * timeInSeconds);
-    forward.multiplyScalar(velocity.z * timeInSeconds);
-
-    controlObject.position.add(forward);
-    controlObject.position.add(sideways);
-
-    oldPosition.copy(controlObject.position);
+    this._camera.position.copy(this._currentPosition);
+    this._camera.lookAt(this._currentLookat);
   }
 }
 
@@ -711,14 +619,21 @@ class World {
     const near = 1.0;
     const far = 1000.0;
     this._camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-    this._camera.position.set(75, 20, 0);
+    this._camera.position.set(25, 10, 10);
+    //code new  for camera tpp
+
+    this._thirdPersonCamera = new ThirdPersonCamera({
+      camera: this._camera,
+    });
 
     this._scene = new THREE.Scene();
+    //raycaster
+    this._raycaster = new THREE.Raycaster();
     // prettier-ignore
     // this._scene = new Physijs.Scene;
     // this._scene.setGravity(new THREE.Vector3(0, -10, 0));
 
-    let light = new THREE.DirectionalLight(0xffffff, 2.0);
+    let light = new THREE.DirectionalLight(0xffffff, 1.3);
     light.position.set(20, 100, 10);
     light.target.position.set(0, 0, 0);
     light.castShadow = true;
@@ -744,11 +659,11 @@ class World {
     // light.position.set(0.8, 1.4, 1.0);
     // this._scene.add(light);
 
-    const controls = new OrbitControls(this._camera, this._threejs.domElement);
-    controls.target.set(0, 20, 0);
-    controls.update();
+    // const controls = new OrbitControls(this._camera, this._threejs.domElement);
+    // controls.target.set(0, 20, 0);
+    // controls.update();
 
-    const loader = new THREE.CubeTextureLoader();
+    // const loader = new THREE.CubeTextureLoader();
     // const texture = loader.load([
     //   "./resources/background/bluecloud_ft.jpg",
     //   "./resources/background/bluecloud_bk.jpg",
@@ -759,11 +674,22 @@ class World {
     // ]);
 
     // this._scene.background = texture;
+    //adding mouse event listner here...
+    this._mouse = {
+      x: undefined,
+      y: undefined,
+    };
+    addEventListener("mousemove", (event) => {
+      this._mouse.x = (event.clientX / innerWidth) * 2 - 1;
+      this._mouse.y = -(event.clientY / innerHeight) * 2 + 1;
+      // console.log(this._mouse);
+    });
 
     const plane = new THREE.Mesh(
-      new THREE.PlaneGeometry(300, 300, 10, 10),
+      new THREE.PlaneGeometry(300, 300, 1, 1),
       new THREE.MeshStandardMaterial({
         color: 0x202020,
+        // color: 0xbced91,
       })
     );
 
@@ -783,17 +709,16 @@ class World {
   }
 
   _LoadHouseModels() {
-    const wallGeometry = new THREE.BoxGeometry(60, 20, 1);
-    const material = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-    });
+    // const wallGeometry = new THREE.BoxGeometry(60, 20, 1);
+    // const material = new THREE.MeshBasicMaterial({
+    //   color: 0xffffff,
+    // });
     // var x = new THREE.BoundingBoxHelper(material);
     // console.log(x);
-    const box = new THREE.Mesh(wallGeometry, material);
-    box.position.set(35, 10, 20);
-
+    // const box = new THREE.Mesh(wallGeometry, material);
+    // box.position.set(35, 10, 20);
+    // this._scene.add(box);
     // var x = new THREE.BoundingBoxHelper(box);
-
     //loading gltf models?
     // const loader = new GLTFLoader();
     // loader.load('./resources/objects/Rocket_Ship_01.gltf',(gltf)=>{
@@ -805,16 +730,88 @@ class World {
     //   this._scene.add(gltf.scene);
     // });
 
-    const loader = new SplineLoader();
-    loader.load(
-      "https://prod.spline.design/oFa6OpS1OjAuYO2c/scene.splinecode",
-      (splineScene) => {
-        console.log(splineScene);
-        this._scene.add(splineScene);
-      }
-    );
+    //spline working
+    // const loader = new SplineLoader();
+    // loader.load(
+    //   "https://prod.spline.design/oFa6OpS1OjAuYO2c/scene.splinecode",
+    //   (splineScene) => {
+    //     console.log(splineScene);
+    //     this._scene.add(splineScene);
+    //   }
+    // );
 
-    // this._scene.add(box);
+    const loader = new FontLoader();
+    loader.load("resources/font/optimer_bold.typeface.json", (font3d) => {
+      loader.load("resources/font/helvetiker_regular.typeface.json", (font) => {
+        const color = 0xbced91;
+
+        const matLite = new THREE.MeshBasicMaterial({
+          color: color,
+          transparent: true,
+          opacity: 0.8,
+          side: THREE.DoubleSide,
+        });
+
+        const message =
+          "A Software Developer\n\nextensively worked on\nFlutter  Chrome Extensions  .NET";
+
+        const shapes = font.generateShapes(message, 7);
+
+        const geometry = new THREE.ShapeGeometry(shapes);
+
+        const text = new THREE.Mesh(geometry, matLite);
+
+        // console.log(text);
+        // console.log(geometry);
+        text.rotateY(110);
+        text.position.x = 140;
+        text.position.z = 160;
+        text.position.y = 80;
+        this._scene.add(text);
+
+        this._text = text;
+        //---------------adding instruction text-----------
+        const inShapes = font.generateShapes("use Arrow Keys\nto move", 6);
+        const inGeometry = new THREE.ShapeGeometry(inShapes);
+
+        const inText = new THREE.Mesh(inGeometry, matLite);
+        inText.rotateY(110);
+        inText.position.x = -70;
+        inText.position.z = 160;
+        inText.position.y = 50;
+        this._scene.add(inText);
+
+        //----------loading 3d text----------------
+        const textGeometry = new TextGeometry(
+          "B.Suraj\n   Software Developer",
+          {
+            font: font3d,
+            size: 4,
+            height: 0.2,
+            curveSegments: 10,
+            bevelEnabled: true,
+            bevelThickness: 0.26,
+            bevelSize: 0.26,
+            bevelOffset: 0,
+            bevelSegments: 5,
+          }
+        );
+
+        const tM = new THREE.MeshPhongMaterial({
+          color: 0xff6458a7,
+          opacity: 0.84,
+          transparent: true,
+        });
+
+        const nameText = new THREE.Mesh(textGeometry, tM);
+        nameText.rotateY(110);
+        nameText.position.x = 15;
+        nameText.position.y = 17;
+        nameText.position.z = 20;
+
+        this._scene.add(nameText);
+      });
+    }); //end load function
   }
 
   _LoadAnimatedModel() {
@@ -823,6 +820,10 @@ class World {
       scene: this._scene,
     };
     this._controls = new BasicCharacterController(params);
+    this._thirdPersonCamera = new ThirdPersonCamera({
+      camera: this._camera,
+      target: this._controls,
+    });
   }
 
   // _LoadAnimatedModel() {
@@ -857,27 +858,27 @@ class World {
   //   });
   // }
 
-  _LoadAnimatedModelAndPlay(path, modelFile, animFile, offset) {
-    const loader = new FBXLoader();
-    loader.setPath(path);
-    loader.load(modelFile, (fbx) => {
-      fbx.scale.setScalar(0.1);
-      fbx.traverse((c) => {
-        c.castShadow = true;
-      });
-      fbx.position.copy(offset);
+  // _LoadAnimatedModelAndPlay(path, modelFile, animFile, offset) {
+  //   const loader = new FBXLoader();
+  //   loader.setPath(path);
+  //   loader.load(modelFile, (fbx) => {
+  //     fbx.scale.setScalar(0.1);
+  //     fbx.traverse((c) => {
+  //       c.castShadow = true;
+  //     });
+  //     fbx.position.copy(offset);
 
-      const anim = new FBXLoader();
-      anim.setPath(path);
-      anim.load(animFile, (anim) => {
-        const m = new THREE.AnimationMixer(fbx);
-        this._mixers.push(m);
-        const idle = m.clipAction(anim.animations[0]);
-        idle.play();
-      });
-      this._scene.add(fbx);
-    });
-  }
+  //     const anim = new FBXLoader();
+  //     anim.setPath(path);
+  //     anim.load(animFile, (anim) => {
+  //       const m = new THREE.AnimationMixer(fbx);
+  //       this._mixers.push(m);
+  //       const idle = m.clipAction(anim.animations[0]);
+  //       idle.play();
+  //     });
+  //     this._scene.add(fbx);
+  //   });
+  // }
 
   _OnWindowResize() {
     this._camera.aspect = window.innerWidth / window.innerHeight;
@@ -890,12 +891,20 @@ class World {
       if (this._previousRAF === null) {
         this._previousRAF = t;
       }
+      // this._raycaster.setFromCamera(this.mouse, this._camera);
 
       this._RAF();
 
       this._threejs.render(this._scene, this._camera);
+
       this._Step(t - this._previousRAF);
       this._previousRAF = t;
+
+      //mouse event ray caster
+      this._raycaster.setFromCamera(this._mouse, this._camera);
+      const inter = this._raycaster.intersectObject(this._text);
+      // console.log(inter);
+      // console.log(this._text);
     });
   }
 
@@ -908,12 +917,12 @@ class World {
     if (this._controls) {
       this._controls.Update(timeElapsedS);
     }
+    this._thirdPersonCamera.Update(timeElapsedS);
+
     //ammo code......
     // this.physicsWorld_.stepSimulation(timeElapsedS, 10);
   }
 }
-
-let _APP = null;
 
 // window.addEventListener("DOMContentLoaded", async () => {
 //   Ammo().then((lib) => {
@@ -922,5 +931,31 @@ let _APP = null;
 //   });
 
 //old code
-_APP = new World();
+let _APP = null;
+
+window.addEventListener("DOMContentLoaded", () => {
+  _APP = new World();
+});
+
 // });
+
+// function _LerpOverFrames(frames, t) {
+//   const s = new THREE.Vector3(0, 0, 0);
+//   const e = new THREE.Vector3(100, 0, 0);
+//   const c = s.clone();
+
+//   for (let i = 0; i < frames; i++) {
+//     c.lerp(e, t);
+//   }
+//   return c;
+// }
+
+// function _TestLerp(t1, t2) {
+//   const v1 = _LerpOverFrames(100, t1);
+//   const v2 = _LerpOverFrames(50, t2);
+//   console.log(v1.x + " | " + v2.x);
+// }
+
+// _TestLerp(0.01, 0.01);
+// _TestLerp(1.0 / 100.0, 1.0 / 50.0);
+// _TestLerp(1.0 - Math.pow(0.3, 1.0 / 100.0), 1.0 - Math.pow(0.3, 1.0 / 50.0));
