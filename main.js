@@ -122,7 +122,6 @@ class BasicCharacterController {
     loader.manager.onLoad = function(){
       bgc[0].style.display = "block";
       document.getElementById('pb').remove();
-      console.log(document.body.innerHTML);
     }
 
     //loading screen code end----x----
