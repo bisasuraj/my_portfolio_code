@@ -48,6 +48,9 @@ import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 // ]);
 // import OrbitControls from "three-orbit-controls";
 
+
+
+
 class BasicCharacterControllerProxy {
   constructor(animations) {
     this._animations = animations;
@@ -91,7 +94,39 @@ class BasicCharacterController {
   }
 
   _LoadModels() {
+
+    //loading c
+// const loadingManager = new THREE.LoadingManager();
+
+// loadingManager.onStart = function(url,item,total){
+//   console.log("Started");
+// }
+
+
     const loader = new FBXLoader();
+
+    //loading screen code.
+
+    
+    var bgc = document.getElementsByTagName("canvas");
+    // bgc[0].setAttribute("hidden", "hidden");
+    console.log(document.body.innerHTML);
+    bgc[0].style.display = "none";
+    const progressBar = document.getElementById('progress-bar');
+
+    loader.manager.onProgress = function(url,loaded,total){
+
+      progressBar.value = (loaded/total) * 100;
+      console.log(progressBar.value);
+    }
+    loader.manager.onLoad = function(){
+      bgc[0].style.display = "block";
+      document.getElementById('pb').remove();
+      console.log(document.body.innerHTML);
+    }
+
+    //loading screen code end----x----
+
     loader.setPath("./resources/character/");
     loader.load("character.fbx", (fbx) => {
       fbx.children[0].material.transparent = false;
@@ -265,6 +300,18 @@ class BasicCharacterControllerInput {
       case 68: // d
         this._keys.right = true;
         break;
+        case 38: // up arow
+        this._keys.forward = true;
+        break;
+      case 37: // left arrow
+        this._keys.left = true;
+        break;
+      case 40: // down arrow
+        this._keys.backward = true;
+        break;
+      case 39: // right arrow
+        this._keys.right = true;
+        break;
       case 32: // SPACE
         this._keys.space = true;
         break;
@@ -286,6 +333,18 @@ class BasicCharacterControllerInput {
         this._keys.backward = false;
         break;
       case 68: // d
+        this._keys.right = false;
+        break;
+      case 38: // up arow
+        this._keys.forward = false;
+        break;
+      case 37: // left arrow
+        this._keys.left = false;
+        break;
+      case 40: // down arrow
+        this._keys.backward = false;
+        break;
+      case 39: // right arrow
         this._keys.right = false;
         break;
       case 32: // SPACE
@@ -633,7 +692,8 @@ class World {
     // this._scene = new Physijs.Scene;
     // this._scene.setGravity(new THREE.Vector3(0, -10, 0));
 
-    let light = new THREE.DirectionalLight(0xffffff, 1.3);
+    //old code had 0xffffff,1.3
+    let light = new THREE.DirectionalLight(0xffffff,0.2);
     light.position.set(20, 100, 10);
     light.target.position.set(0, 0, 0);
     light.castShadow = true;
@@ -688,7 +748,8 @@ class World {
     const plane = new THREE.Mesh(
       new THREE.PlaneGeometry(300, 300, 1, 1),
       new THREE.MeshStandardMaterial({
-        color: 0x202020,
+        color: new THREE.Color(0xae9273)
+        // color: 0x202020,
         // color: 0xbced91,
       })
     );
@@ -743,19 +804,23 @@ class World {
     const loader = new FontLoader();
     loader.load("resources/font/optimer_bold.typeface.json", (font3d) => {
       loader.load("resources/font/helvetiker_regular.typeface.json", (font) => {
-        const color = 0xbced91;
+        // const color = 0xbced91;
+        
 
         const matLite = new THREE.MeshBasicMaterial({
-          color: color,
+          color: 0x67ACA2,
           transparent: true,
           opacity: 0.8,
           side: THREE.DoubleSide,
         });
 
         const message =
-          "A Software Developer\n\nextensively worked on\nFlutter  Chrome Extensions  .NET";
-
-        const shapes = font.generateShapes(message, 7);
+          // "A Software Developer\n\nextensively worked on\nFlutter  Chrome Extensions  .NET";
+          // "Welcome to my portfolio!\n\nI'm a full-stack software developer with a passion for building applications that deliver exceptional user experiences and can scale to meet business needs. \nWith proven expertise in both application and SDK development, I'm skilled in driving improvements throughout the product lifecycle. \nMy excellent communication skills enable me to lead teams and collaborate effectively with cross-functional groups, while my adaptability \nensures success in diverse environments. I'm proficient in a range of technologies and languages, including \nC, C++, C#, Dart, JavaScript, and Python, and have hands-on experience working with tools such as \nFlutter, W.P.F, IoT, Git, VS Code, Postman, Figma, Notion, Slack, Play Console, Xcode, Firebase, Micro-Controllers, and Chrome Extensions.\nLet's explore my portfolio and learn more about my professional and personal projects.";
+          // "Welcome to my portfolio! \n\nI'm a full-stack software developer with a passion for building intricate software that deliver exceptional user experiences \nand can scale to meet business needs. I'm skilled in driving improvements throughout the product lifecycle \nand have hands-on experience working with technologies and languages such as C, C++, C#, Dart, JavaScript, and Python, \nas well as tools like Flutter, WPF, IoT, Git, VS Code, Postman, Notion, Slack, Play Console, Xcode, Firebase, and Chrome Extensions. \nLet's explore my portfolio and learn more about my professional and personal projects.";
+          "Thrilled to have you here. \n\nI'm a full-stack software developer with a love for crafting user-focused software that scales effortlessly. \nWith a wide range of skills and experience, I'm constantly driving improvements throughout the product lifecycle. \nI can't wait to show you my professional and personal projects. \nLet's dive in!";
+          //7
+        const shapes = font.generateShapes(message, 11);
 
         const geometry = new THREE.ShapeGeometry(shapes);
 
@@ -764,21 +829,27 @@ class World {
         // console.log(text);
         // console.log(geometry);
         text.rotateY(110);
-        text.position.x = 140;
-        text.position.z = 160;
-        text.position.y = 80;
+        text.position.x = 380;
+        text.position.z = 360;
+        text.position.y = 150;
+        // text.position.x = 140;
+        // text.position.z = 160;
+        // text.position.y = 80;
         this._scene.add(text);
 
         this._text = text;
         //---------------adding instruction text-----------
-        const inShapes = font.generateShapes("use Arrow Keys\nto move", 6);
+        const inShapes = font.generateShapes("use Arrow keys to move\nand\nhold Shift to run", 2);
         const inGeometry = new THREE.ShapeGeometry(inShapes);
 
         const inText = new THREE.Mesh(inGeometry, matLite);
         inText.rotateY(110);
-        inText.position.x = -70;
-        inText.position.z = 160;
-        inText.position.y = 50;
+        // inText.position.x = -70;
+        // inText.position.z = 160;
+        // inText.position.y = 50;
+        inText.position.x = -40;
+        inText.position.z = 70;
+        inText.position.y = 18;
         this._scene.add(inText);
 
         //----------loading 3d text----------------
@@ -798,7 +869,8 @@ class World {
         );
 
         const tM = new THREE.MeshPhongMaterial({
-          color: 0xff6458a7,
+          // color: 0xff6458a7,
+          color: 0x504685,
           opacity: 0.84,
           transparent: true,
         });
@@ -902,7 +974,7 @@ class World {
 
       //mouse event ray caster
       this._raycaster.setFromCamera(this._mouse, this._camera);
-      const inter = this._raycaster.intersectObject(this._text);
+      // const inter = this._raycaster.intersectObject(this._text);
       // console.log(inter);
       // console.log(this._text);
     });

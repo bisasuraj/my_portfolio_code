@@ -4,20 +4,52 @@
     <!-- <base href="https://bisasuraj.github.io/my_portfolio/" /> -->
     <!-- <base href="/my_portfolio/" /> -->
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <!-- <link rel="icon" type="image/svg+xml" href="favicon.svg" /> -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite App</title>
+    <title>My Portfolio</title>
 
     <!-- <script src="https://cdn.jsdelivr.net/gh/kripken/ammo.js@HEAD/builds/ammo.wasm.js"></script> -->
+      <style>
+        body{
+          margin: 0;
+        }
+        .progress-bar-container{
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate (-50%, -50%) ;
+        width: 50%;
+        height: 20%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      #progress-bar{
+        justify-content: center;
+        width: 30%;
+        margin-top: 0.5%;
+        height: 20%;
+      }
+      label{
+        color: black;
+        font-size: 2rem;
+      }
+      </style>
   </head>
   <body>
-    <canvas style="position: fixed; top: 0; left: 0" id="bg"></canvas>
+    <div class="progress-bar-container" id="pb">
+      <label for="progress-bar">Loading... </label>
+      <progress id="progress-bar" value="0" max="100"></progress>
+    </div>
+    <!-- <canvas style="position: fixed; top: 0; left: 0" id="bg" hidden="hidden"></canvas> -->
     <!-- <script src="physi.js"></script> -->
     <!-- <script type="text/javascript" src="/js/Three.js"></script>
     <script type="text/javascript" src="/js/physi.js"></script> -->
     <!-- <script type="module">
       import three from "https://cdn.skypack.dev/three";
     </script> -->
+    <!-- Loading screen -->
+    
     <script type="module" src="./main.js"></script>
   </body>
 </html>
