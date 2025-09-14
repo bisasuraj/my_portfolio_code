@@ -1,6 +1,6 @@
 // "use strict";
 
-import "./style.css";
+// import "/css/style.css";
 import * as THREE from "three";
 // // import * as THREE from "three";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
