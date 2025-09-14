@@ -110,14 +110,14 @@ class BasicCharacterController {
     
     var bgc = document.getElementsByTagName("canvas");
     // bgc[0].setAttribute("hidden", "hidden");
-    console.log(document.body.innerHTML);
+    // console.log(document.body.innerHTML);
     bgc[0].style.display = "none";
     const progressBar = document.getElementById('progress-bar');
 
     loader.manager.onProgress = function(url,loaded,total){
 
       progressBar.value = (loaded/total) * 100;
-      console.log(progressBar.value);
+      // console.log(progressBar.value);
     }
     loader.manager.onLoad = function(){
       bgc[0].style.display = "block";
