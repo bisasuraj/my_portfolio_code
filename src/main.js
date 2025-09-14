@@ -102,6 +102,9 @@ class BasicCharacterController {
 //   console.log("Started");
 // }
 
+// ✅ Use new URL to resolve FBX file path in Vite
+const characterPath = new URL('./resources/character/character.fbx', import.meta.url).href;
+
 const loader = new FBXLoader();
 
 // loading screen code
@@ -133,10 +136,9 @@ loader.manager.onLoad = function() {
 };
 // loading screen code end
 
-loader.setPath("resources/character/");
-// const path = require(resources/character/character.fbx); //写在类的外面
+// Use the resolved URL instead of require()
 loader.load(
-    "character.fbx",
+    characterPath,
     (fbx) => {
         console.log("Character FBX loaded:", fbx);
 
@@ -183,14 +185,13 @@ loader.load(
         };
 
         const animLoader = new FBXLoader(this._manager);
-        animLoader.setPath("resources/character/");
         console.log("Animation loader initialized");
 
         const animFiles = [
-            { name: "walk", file: "walk3.fbx" },
-            { name: "run", file: "run3.fbx" },
-            { name: "idle", file: "idle3.fbx" },
-            { name: "dance", file: "dance3.fbx" },
+            { name: "walk", file: new URL('./resources/character/walk3.fbx', import.meta.url).href },
+            { name: "run", file: new URL('./resources/character/run3.fbx', import.meta.url).href },
+            { name: "idle", file: new URL('./resources/character/idle3.fbx', import.meta.url).href },
+            { name: "dance", file: new URL('./resources/character/dance3.fbx', import.meta.url).href },
         ];
 
         animFiles.forEach(anim => {
