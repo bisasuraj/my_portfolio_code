@@ -126,7 +126,7 @@ class BasicCharacterController {
 
     //loading screen code end----x----
 
-    loader.setPath("/resources/character/");
+    loader.setPath("resources/character/");
     loader.load("character.fbx", (fbx) => {
       fbx.children[0].material.transparent = false;
 
@@ -156,7 +156,7 @@ class BasicCharacterController {
       };
 
       const loader = new FBXLoader(this._manager);
-      loader.setPath("/resources/character/");
+      loader.setPath("resources/character/");
       loader.load("walk3.fbx", (a) => {
         _OnLoad("walk", a);
       });
