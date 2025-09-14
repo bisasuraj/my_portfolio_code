@@ -102,7 +102,6 @@ class BasicCharacterController {
 //   console.log("Started");
 // }
 
-
 const loader = new FBXLoader();
 
 // loading screen code
@@ -135,59 +134,77 @@ loader.manager.onLoad = function() {
 // loading screen code end
 
 loader.setPath("resources/character/");
-loader.load("character.fbx", (fbx) => {
-    console.log("Character FBX loaded:", fbx);
+loader.load(
+    "character.fbx",
+    (fbx) => {
+        console.log("Character FBX loaded:", fbx);
 
-    if (fbx.children[0]) {
-        fbx.children[0].material.transparent = false;
-        console.log("Set character material transparency to false");
-    } else {
-        console.warn("FBX has no children");
-    }
+        if (fbx.children[0]) {
+            fbx.children[0].material.transparent = false;
+            console.log("Set character material transparency to false");
+        } else {
+            console.warn("FBX has no children");
+        }
 
-    fbx.scale.setScalar(0.1);
-    console.log("Character scaled to 0.1");
+        fbx.scale.setScalar(0.1);
+        console.log("Character scaled to 0.1");
 
-    fbx.traverse((c) => {
-        c.castShadow = true;
-    });
-    console.log("Set castShadow = true for all children");
+        fbx.traverse((c) => {
+            c.castShadow = true;
+        });
+        console.log("Set castShadow = true for all children");
 
-    this._target = fbx;
-    this._params.scene.add(this._target);
-    console.log("Character added to scene");
+        this._target = fbx;
+        this._params.scene.add(this._target);
+        console.log("Character added to scene");
 
-    this._mixer = new THREE.AnimationMixer(this._target);
-    console.log("Animation mixer created");
+        this._mixer = new THREE.AnimationMixer(this._target);
+        console.log("Animation mixer created");
 
-    this._manager = new THREE.LoadingManager();
-    this._manager.onLoad = () => {
-        console.log("All animations loaded, setting state to idle");
-        this._stateMachine.SetState("idle");
-    };
-
-    const _OnLoad = (animName, anim) => {
-        console.log(`Animation loaded: ${animName}`, anim);
-        const clip = anim.animations[0];
-        const action = this._mixer.clipAction(clip);
-
-        this._animations[animName] = {
-            clip: clip,
-            action: action,
+        this._manager = new THREE.LoadingManager();
+        this._manager.onLoad = () => {
+            console.log("All animations loaded, setting state to idle");
+            this._stateMachine.SetState("idle");
         };
-        console.log(`Animation ${animName} added to _animations`);
-    };
 
-    const animLoader = new FBXLoader(this._manager);
-    animLoader.setPath("resources/character/");
-    console.log("Animation loader initialized");
+        const _OnLoad = (animName, anim) => {
+            if (!anim || !anim.animations || anim.animations.length === 0) {
+                console.error(`Animation ${animName} is empty or invalid!`);
+                return;
+            }
 
-    animLoader.load("walk3.fbx", (a) => _OnLoad("walk", a));
-    animLoader.load("run3.fbx", (a) => _OnLoad("run", a));
-    animLoader.load("idle3.fbx", (a) => _OnLoad("idle", a));
-    animLoader.load("dance3.fbx", (a) => _OnLoad("dance", a));
-    console.log("Animation loading started");
-});
+            console.log(`Animation loaded: ${animName}`, anim);
+            const clip = anim.animations[0];
+            const action = this._mixer.clipAction(clip);
+
+            this._animations[animName] = { clip, action };
+            console.log(`Animation ${animName} added to _animations`);
+        };
+
+        const animLoader = new FBXLoader(this._manager);
+        animLoader.setPath("resources/character/");
+        console.log("Animation loader initialized");
+
+        const animFiles = [
+            { name: "walk", file: "walk3.fbx" },
+            { name: "run", file: "run3.fbx" },
+            { name: "idle", file: "idle3.fbx" },
+            { name: "dance", file: "dance3.fbx" },
+        ];
+
+        animFiles.forEach(anim => {
+            animLoader.load(
+                anim.file,
+                (a) => _OnLoad(anim.name, a),
+                undefined,
+                (err) => console.error(`Failed to load ${anim.file}:`, err)
+            );
+        });
+        console.log("Animation loading started");
+    },
+    undefined,
+    (err) => console.error("Failed to load character.fbx:", err)
+);
   }
 
   get Position() {
