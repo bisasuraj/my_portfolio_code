@@ -134,7 +134,7 @@ loader.manager.onLoad = function() {
 // loading screen code end
 
 loader.setPath("resources/character/");
-const path = require(resources/character/character.fbx); //写在类的外面
+// const path = require(resources/character/character.fbx); //写在类的外面
 loader.load(
     "character.fbx",
     (fbx) => {
