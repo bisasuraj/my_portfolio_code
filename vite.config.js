@@ -1,6 +1,6 @@
 import { defineConfig } from "vite";
 
-// export default defineConfig({
-//   // ...
-//   base: "/my_portfolio_/",
-// });
+export default defineConfig({
+  // ...
+  base: "/my_portfolio_code/",
+});
