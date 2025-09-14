@@ -103,73 +103,91 @@ class BasicCharacterController {
 // }
 
 
-    const loader = new FBXLoader();
+const loader = new FBXLoader();
 
-    //loading screen code.
+// loading screen code
+var bgc = document.getElementsByTagName("canvas");
+console.log("Canvas elements found:", bgc.length);
 
-    
-    var bgc = document.getElementsByTagName("canvas");
-    // bgc[0].setAttribute("hidden", "hidden");
-    // console.log(document.body.innerHTML);
+if (bgc[0]) {
     bgc[0].style.display = "none";
-    const progressBar = document.getElementById('progress-bar');
+    console.log("Canvas hidden");
+} else {
+    console.warn("No canvas found");
+}
 
-    loader.manager.onProgress = function(url,loaded,total){
+const progressBar = document.getElementById('progress-bar');
+console.log("Progress bar element:", progressBar);
 
-      progressBar.value = (loaded/total) * 100;
-      // console.log(progressBar.value);
+loader.manager.onProgress = function(url, loaded, total) {
+    const progress = (loaded / total) * 100;
+    progressBar.value = progress;
+    console.log(`Loading ${url}: ${loaded}/${total} (${progress.toFixed(2)}%)`);
+};
+
+loader.manager.onLoad = function() {
+    console.log("All assets loaded");
+    if (bgc[0]) bgc[0].style.display = "block";
+    const pbElement = document.getElementById('pb');
+    if (pbElement) pbElement.remove();
+    console.log("Progress bar removed, canvas visible");
+};
+// loading screen code end
+
+loader.setPath("resources/character/");
+loader.load("character.fbx", (fbx) => {
+    console.log("Character FBX loaded:", fbx);
+
+    if (fbx.children[0]) {
+        fbx.children[0].material.transparent = false;
+        console.log("Set character material transparency to false");
+    } else {
+        console.warn("FBX has no children");
     }
-    loader.manager.onLoad = function(){
-      bgc[0].style.display = "block";
-      document.getElementById('pb').remove();
-    }
 
-    //loading screen code end----x----
+    fbx.scale.setScalar(0.1);
+    console.log("Character scaled to 0.1");
 
-    loader.setPath("resources/character/");
-    loader.load("character.fbx", (fbx) => {
-      fbx.children[0].material.transparent = false;
-
-      fbx.scale.setScalar(0.1);
-      fbx.traverse((c) => {
+    fbx.traverse((c) => {
         c.castShadow = true;
-      });
+    });
+    console.log("Set castShadow = true for all children");
 
-      this._target = fbx;
-      this._params.scene.add(this._target);
+    this._target = fbx;
+    this._params.scene.add(this._target);
+    console.log("Character added to scene");
 
-      this._mixer = new THREE.AnimationMixer(this._target);
+    this._mixer = new THREE.AnimationMixer(this._target);
+    console.log("Animation mixer created");
 
-      this._manager = new THREE.LoadingManager();
-      this._manager.onLoad = () => {
+    this._manager = new THREE.LoadingManager();
+    this._manager.onLoad = () => {
+        console.log("All animations loaded, setting state to idle");
         this._stateMachine.SetState("idle");
-      };
+    };
 
-      const _OnLoad = (animName, anim) => {
+    const _OnLoad = (animName, anim) => {
+        console.log(`Animation loaded: ${animName}`, anim);
         const clip = anim.animations[0];
         const action = this._mixer.clipAction(clip);
 
         this._animations[animName] = {
-          clip: clip,
-          action: action,
+            clip: clip,
+            action: action,
         };
-      };
+        console.log(`Animation ${animName} added to _animations`);
+    };
 
-      const loader = new FBXLoader(this._manager);
-      loader.setPath("resources/character/");
-      loader.load("walk3.fbx", (a) => {
-        _OnLoad("walk", a);
-      });
-      loader.load("run3.fbx", (a) => {
-        _OnLoad("run", a);
-      });
-      loader.load("idle3.fbx", (a) => {
-        _OnLoad("idle", a);
-      });
-      loader.load("dance3.fbx", (a) => {
-        _OnLoad("dance", a);
-      });
-    });
+    const animLoader = new FBXLoader(this._manager);
+    animLoader.setPath("resources/character/");
+    console.log("Animation loader initialized");
+
+    animLoader.load("walk3.fbx", (a) => _OnLoad("walk", a));
+    animLoader.load("run3.fbx", (a) => _OnLoad("run", a));
+    animLoader.load("idle3.fbx", (a) => _OnLoad("idle", a));
+    animLoader.load("dance3.fbx", (a) => _OnLoad("dance", a));
+    console.log("Animation loading started");
+});
   }
 
   get Position() {
