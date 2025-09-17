@@ -56,6 +56,7 @@ class BasicCharacterController {
     this._LoadModels();
   }
 
+  
   /**
    * Load the main character model and all animations
    */
