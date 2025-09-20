@@ -1,6 +1,6 @@
 # my_portfolio_code
 
-## Hosted on: https://bisasuraj.github.io/my_portfolio_/
+## Hosted on: https://bisasuraj.github.io/my_portfolio_code
 Please give it a second to load up, It will be worth it. :)
 
 ### This is the main repo for my hosted portfolio 
