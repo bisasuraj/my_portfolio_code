@@ -2,3 +2,4 @@ node_modules
 dist
 # Ignore macOS system files
 .DS_Store
+public/resources/.DS_Store

@@ -10,7 +10,7 @@
   "devDependencies": {
     "@types/node": "^17.0.15",
     "copy-webpack-plugin": "^10.2.4",
-    "vite": "^2.9.14"
+    "vite": "^7.1.6"
   },
   "dependencies": {
     "@splinetool/loader": "^0.9.73",

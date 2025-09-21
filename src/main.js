@@ -65,7 +65,8 @@ class BasicCharacterController {
     this._setupLoadingScreen();
 
     // Get the path to character model using Vite's import system
-    const characterPath = new URL('./resources/character/character.fbx', import.meta.url).href;
+    // const characterPath = new URL('./resources/character/character.fbx', import.meta.url).href;
+    const characterPath = "resources/character/character.fbx";
     const loader = new FBXLoader();
 
     // Set up loading progress tracking
@@ -192,10 +193,10 @@ class BasicCharacterController {
 
     // Define all animation files to load
     const animFiles = [
-      { name: "walk", file: new URL('./resources/character/walk3.fbx', import.meta.url).href },
-      { name: "run", file: new URL('./resources/character/run3.fbx', import.meta.url).href },
-      { name: "idle", file: new URL('./resources/character/idle3.fbx', import.meta.url).href },
-      { name: "dance", file: new URL('./resources/character/dance3.fbx', import.meta.url).href },
+      { name: "walk", file: 'resources/character/walk3.fbx'},
+      { name: "run", file: "resources/character/run3.fbx" },
+      { name: "idle", file: "resources/character/idle3.fbx" },
+      { name: "dance", file: "resources/character/dance3.fbx" },
     ];
 
     // Load each animation file
