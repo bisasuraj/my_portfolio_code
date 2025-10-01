@@ -57,8 +57,47 @@
         color: black;
         font-size: 2rem;
       }
+
+      /* Virtual Joystick Styles */
+      #joystick-container {
+        display: block;
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        width: 150px;
+        height: 150px;
+        z-index: 1000;
+      }
+
+      #joystick-base {
+        position: absolute;
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        border: 3px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      #joystick-stick {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.8);
+        border: 3px solid rgba(255, 255, 255, 1);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        transition: background 0.1s;
+      }
+
+      #joystick-stick.active {
+        background: rgba(100, 200, 255, 0.9);
+      }
     </style>
-    <script type="module" crossorigin src="/my_portfolio_code/assets/index-Cyze8WTN.js"></script>
+    <script type="module" crossorigin src="/my_portfolio_code/assets/index-B3kkosxL.js"></script>
     <link rel="stylesheet" crossorigin href="/my_portfolio_code/assets/index-DgGIbVmK.css">
   </head>
   <body>
@@ -73,12 +112,10 @@
       </div>
     </div>
 
-    <!-- Navigation Controls -->
-    <div id="controls">
-      <button id="btn-left">⬅</button>
-      <button id="btn-forward">⬆</button>
-      <button id="btn-right">➡</button>
-      <button id="btn-backward">⬇</button>
+    <!-- Virtual Joystick -->
+    <div id="joystick-container">
+      <div id="joystick-base"></div>
+      <div id="joystick-stick"></div>
     </div>
 
     <!-- Three.js Canvas -->
