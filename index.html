@@ -36,20 +36,21 @@
       }
       </style>
   </head>
-  <body>
-    <div class="progress-bar-container" id="pb">
-      <label for="progress-bar">Loading... </label>
-      <progress id="progress-bar" value="0" max="100"></progress>
+<body>
+  <!-- Loading Screen -->
+  <div id="loading-screen">
+    <div class="loader">
+      <div class="spinner"></div>
+      <p id="loading-text">Loading... <span id="loading-percent">0%</span></p>
+      <div class="progress-wrapper">
+        <div id="progress-bar"></div>
+      </div>
     </div>
-    <!-- <canvas style="position: fixed; top: 0; left: 0" id="bg" hidden="hidden"></canvas> -->
-    <!-- <script src="physi.js"></script> -->
-    <!-- <script type="text/javascript" src="/js/Three.js"></script>
-    <script type="text/javascript" src="/js/physi.js"></script> -->
-    <!-- <script type="module">
-      import three from "https://cdn.skypack.dev/three";
-    </script> -->
-    <!-- Loading screen -->
-    
-    <script type="module" src="/src/main.js"></script>
-  </body>
+  </div>
+
+  <!-- Three.js Canvas -->
+  <canvas id="bg"></canvas>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
 </html>

@@ -54,26 +54,27 @@ export class CharacterController {
     }
   }
 
-  _setupLoadingProgress(loader) {
-    const progressBar = document.getElementById('progress-bar');
-    console.log("Progress bar element:", progressBar);
+_setupLoadingProgress(loader) {
+  const progressBar = document.getElementById("progress-bar");
+  const percentText = document.getElementById("loading-percent");
+  const loadingScreen = document.getElementById("loading-screen");
 
-    loader.manager.onProgress = function(url, loaded, total) {
-      const progress = (loaded / total) * 100;
-      if (progressBar) progressBar.value = progress;
-      console.log(`Loading ${url}: ${loaded}/${total} (${progress.toFixed(2)}%)`);
-    };
+  loader.manager.onProgress = function (url, loaded, total) {
+    const progress = (loaded / total) * 100;
+    if (progressBar) progressBar.style.width = progress + "%";
+    if (percentText) percentText.textContent = Math.floor(progress) + "%";
+  };
 
-    loader.manager.onLoad = function() {
-      console.log("All assets loaded");
-      const canvas = document.getElementsByTagName("canvas")[0];
-      if (canvas) canvas.style.display = "block";
-      
-      const progressElement = document.getElementById('pb');
-      if (progressElement) progressElement.remove();
-      console.log("Loading complete - progress bar removed, canvas visible");
-    };
-  }
+  loader.manager.onLoad = function () {
+    console.log("All assets loaded");
+    if (loadingScreen) {
+      loadingScreen.classList.add("hidden"); // fade out
+      setTimeout(() => loadingScreen.remove(), 1000);
+    }
+    const canvas = document.getElementsByTagName("canvas")[0];
+    if (canvas) canvas.style.display = "block";
+  };
+}
 
   _onCharacterLoaded(fbx) {
     console.log("Character FBX loaded:", fbx);
