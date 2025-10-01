@@ -2,11 +2,33 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
     <meta name="description" content="Personal portfolio showcasing my work and projects" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="screen-orientation" content="landscape" />
     <link rel="icon" type="image/svg+xml" href="/my_portfolio_code/assets/favicon-OtBKyZol.svg" />
     <title>My Portfolio</title>
     <style>
+      @media screen and (orientation: portrait) and (max-width: 768px) {
+        body::before {
+          content: "Please rotate your device to Landscape mode";
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.95);
+          color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 9999;
+          font-size: 1.5rem;
+          text-align: center;
+          padding: 2rem;
+        }
+      }
+
       body {
         margin: 0;
         padding: 0;
