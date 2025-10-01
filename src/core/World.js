@@ -14,13 +14,13 @@ export class World {
     this._threejs = SceneSetup.createRenderer();
     this._camera = SceneSetup.createCamera();
     this._scene = SceneSetup.createScene();
-    
+
     // Set up mouse interaction
     this._setupMouseInteraction();
-    
+
     // Create ground
     SceneSetup.createGround(this._scene);
-    
+
     // Initialize arrays for animations and timing
     this._mixers = [];
     this._previousRAF = null;
@@ -31,6 +31,9 @@ export class World {
 
     // Handle window resizing
     window.addEventListener("resize", () => this._OnWindowResize(), false);
+
+    // Handle mobile viewport changes (address bar show/hide)
+    window.visualViewport?.addEventListener("resize", () => this._OnWindowResize(), false);
 
     // Start the animation loop
     this._RAF();

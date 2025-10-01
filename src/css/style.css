@@ -11,8 +11,15 @@ canvas {
   top: 0;
   left: 0;
   width: 100vw !important;
-  height: 100vh !important;
+  height: 100svh !important; /* Use small viewport height for mobile */
   display: block;
+}
+
+/* Fallback for browsers that don't support svh */
+@supports not (height: 100svh) {
+  canvas {
+    height: 100vh !important;
+  }
 }
 body {
   margin: 0;

@@ -16,7 +16,9 @@ export class SceneSetup {
   }
 
   static createCamera() {
-    const fov = 60;
+    // Increase FOV on mobile to show more of the scene vertically
+    const isMobile = window.innerWidth <= 768 || ('ontouchstart' in window);
+    const fov = isMobile ? 70 : 60;
     const aspect = window.innerWidth / window.innerHeight;
     const near = 1.0;
     const far = 1000.0;
