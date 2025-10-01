@@ -21,52 +21,115 @@ export class CharacterInput {
       shift: false,
     };
 
+    // Joystick state
+    this._joystickActive = false;
+    this._joystickVector = { x: 0, y: 0 };
+
     // Keyboard input
     document.addEventListener("keydown", (e) => this._onKeyDown(e), false);
     document.addEventListener("keyup", (e) => this._onKeyUp(e), false);
 
-    // On-screen buttons input - retry until buttons are found
-    this._setupButtons();
+    // Setup virtual joystick
+    this._setupJoystick();
   }
 
-  _setupButtons() {
-    const btnMap = {
-      "btn-forward": "forward",
-      "btn-backward": "backward",
-      "btn-left": "left",
-      "btn-right": "right",
-    };
-
+  _setupJoystick() {
     const trySetup = () => {
-      let allFound = true;
+      const container = document.getElementById("joystick-container");
+      const stick = document.getElementById("joystick-stick");
+      const base = document.getElementById("joystick-base");
 
-      Object.keys(btnMap).forEach((id) => {
-        const el = document.getElementById(id);
-        if (!el) {
-          allFound = false;
-          return;
+      if (!container || !stick || !base) {
+        setTimeout(trySetup, 100);
+        return;
+      }
+
+      const maxDistance = 45; // Maximum distance the stick can move from center
+      let isDragging = false;
+      let startX = 0;
+      let startY = 0;
+
+      const updateJoystick = (clientX, clientY) => {
+        const rect = base.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        let deltaX = clientX - centerX;
+        let deltaY = clientY - centerY;
+
+        // Calculate distance from center
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+        // Limit the stick movement to maxDistance
+        if (distance > maxDistance) {
+          const angle = Math.atan2(deltaY, deltaX);
+          deltaX = Math.cos(angle) * maxDistance;
+          deltaY = Math.sin(angle) * maxDistance;
         }
 
-        // Press
-        ["touchstart", "mousedown"].forEach((evt) =>
-          el.addEventListener(evt, (e) => {
-            e.preventDefault();
-            this._keys[btnMap[id]] = true;
-          })
-        );
+        // Update stick position
+        stick.style.transform = `translate(calc(-50% + ${deltaX}px), calc(-50% + ${deltaY}px))`;
 
-        // Release
-        ["touchend", "mouseup", "mouseleave"].forEach((evt) =>
-          el.addEventListener(evt, (e) => {
-            e.preventDefault();
-            this._keys[btnMap[id]] = false;
-          })
-        );
-      });
+        // Normalize the vector (-1 to 1)
+        this._joystickVector.x = deltaX / maxDistance;
+        this._joystickVector.y = deltaY / maxDistance;
 
-      if (!allFound) {
-        setTimeout(trySetup, 100);
-      }
+        // Update movement keys based on joystick position
+        const threshold = 0.3;
+        this._keys.forward = this._joystickVector.y < -threshold;
+        this._keys.backward = this._joystickVector.y > threshold;
+        this._keys.left = this._joystickVector.x < -threshold;
+        this._keys.right = this._joystickVector.x > threshold;
+      };
+
+      const resetJoystick = () => {
+        stick.style.transform = "translate(-50%, -50%)";
+        stick.classList.remove("active");
+        this._joystickVector.x = 0;
+        this._joystickVector.y = 0;
+        this._joystickActive = false;
+
+        // Reset all movement keys
+        this._keys.forward = false;
+        this._keys.backward = false;
+        this._keys.left = false;
+        this._keys.right = false;
+      };
+
+      const onStart = (e) => {
+        e.preventDefault();
+        isDragging = true;
+        this._joystickActive = true;
+        stick.classList.add("active");
+
+        const touch = e.touches ? e.touches[0] : e;
+        updateJoystick(touch.clientX, touch.clientY);
+      };
+
+      const onMove = (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+
+        const touch = e.touches ? e.touches[0] : e;
+        updateJoystick(touch.clientX, touch.clientY);
+      };
+
+      const onEnd = (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        isDragging = false;
+        resetJoystick();
+      };
+
+      // Touch events
+      base.addEventListener("touchstart", onStart, { passive: false });
+      document.addEventListener("touchmove", onMove, { passive: false });
+      document.addEventListener("touchend", onEnd, { passive: false });
+
+      // Mouse events (for testing on desktop)
+      base.addEventListener("mousedown", onStart);
+      document.addEventListener("mousemove", onMove);
+      document.addEventListener("mouseup", onEnd);
     };
 
     trySetup();
