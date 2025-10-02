@@ -3,14 +3,18 @@ import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry";
 
 export class TextElements {
+  static linkedInIcon = null;
+  static linkedInText = null;
+
   static loadAndCreateText(scene) {
     const loader = new FontLoader();
-    
+
     loader.load("resources/font/optimer_bold.typeface.json", (font3d) => {
       loader.load("resources/font/helvetiker_regular.typeface.json", (font) => {
         TextElements._createWelcomeText(scene, font);
         TextElements._createInstructionText(scene, font);
         TextElements._create3DNameText(scene, font3d);
+        TextElements._createLinkedInSection(scene, font);
       });
     });
   }
@@ -29,7 +33,7 @@ export class TextElements {
                    "I can't wait to show you my professional and personal projects. \n" +
                    "Let's dive in!";
 
-    const shapes = font.generateShapes(message, 11);
+    const shapes = font.generateShapes(message, 6);
     const geometry = new THREE.ShapeGeometry(shapes);
     const text = new THREE.Mesh(geometry, material);
 
@@ -68,7 +72,7 @@ export class TextElements {
       bevelOffset: 0,
       bevelSegments: 5,
     });
-
+    
     const material = new THREE.MeshPhongMaterial({
       color: 0x504685,
       opacity: 0.84,
@@ -76,9 +80,94 @@ export class TextElements {
     });
 
     const nameText = new THREE.Mesh(textGeometry, material);
-    
+
     nameText.rotateY(110);
     nameText.position.set(15, 17, 20);
     scene.add(nameText);
+  }
+
+static _createLinkedInSection(scene, font) {
+  // Create "Check out my LinkedIn here" text
+  const textMaterial = new THREE.MeshBasicMaterial({
+    color: 0x67ACA2,
+    transparent: true,
+    opacity: 0.85,
+    side: THREE.DoubleSide,
+  });
+
+  const message = "Check out my LinkedIn here:";
+  const shapes = font.generateShapes(message, 3.5);
+  const textGeometry = new THREE.ShapeGeometry(shapes);
+  const linkedInText = new THREE.Mesh(textGeometry, textMaterial);
+
+  linkedInText.rotateY(30);
+  linkedInText.position.set(115, 30,40);
+  scene.add(linkedInText);
+
+  // Store reference for interaction
+  TextElements.linkedInText = linkedInText;
+
+  // Create glow texture programmatically
+  const canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 256;
+  const ctx = canvas.getContext('2d');
+
+  // Create radial gradient for glow effect
+  const gradient = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
+  gradient.addColorStop(0, 'rgba(0, 160, 220, 0.8)');
+  gradient.addColorStop(0.5, 'rgba(0, 160, 220, 0.4)');
+  gradient.addColorStop(1, 'rgba(0, 160, 220, 0)');
+
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, 256, 256);
+
+  const glowTexture = new THREE.CanvasTexture(canvas);
+
+  // ✅ LinkedIn icon
+  const textureLoader = new THREE.TextureLoader();
+  const linkedInTexture = textureLoader.load("resources/linkedin.png");
+
+  const iconMaterial = new THREE.MeshBasicMaterial({
+    map: linkedInTexture,
+    transparent: true,
+    side: THREE.DoubleSide
+  });
+
+  const iconGeometry = new THREE.PlaneGeometry(10, 10);
+  const iconMesh = new THREE.Mesh(iconGeometry, iconMaterial);
+
+  iconMesh.rotateY(30);
+  iconMesh.position.set(115, 30,100);
+
+  // ✅ Glow plane with programmatic texture
+  const glowMaterial = new THREE.MeshBasicMaterial({
+    map: glowTexture,
+    transparent: true,
+    opacity: 0,
+    side: THREE.DoubleSide,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending
+  });
+
+  const glowGeometry = new THREE.PlaneGeometry(16, 16);
+  const glowMesh = new THREE.Mesh(glowGeometry, glowMaterial);
+  glowMesh.position.z = -0.2;
+
+  iconMesh.add(glowMesh);
+  scene.add(iconMesh);
+
+  // Store references for interaction
+  TextElements.linkedInIcon = iconMesh;
+  iconMesh.userData.isLinkedInIcon = true;
+  iconMesh.userData.url = "https://www.linkedin.com/in/suraj-bisa-b95b2a18a/";
+  iconMesh.userData.glow = glowMesh;
+  iconMesh.userData.glowMaterial = glowMaterial;
+}
+
+
+
+  static getInteractableObjects() {
+    return TextElements.linkedInIcon ? [TextElements.linkedInIcon] : [];
   }
 }

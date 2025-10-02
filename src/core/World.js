@@ -42,11 +42,86 @@ export class World {
   _setupMouseInteraction() {
     this._raycaster = new THREE.Raycaster();
     this._mouse = { x: undefined, y: undefined };
-    
+    this._hoveredObject = null;
+
     addEventListener("mousemove", (event) => {
       this._mouse.x = (event.clientX / innerWidth) * 2 - 1;
       this._mouse.y = -(event.clientY / innerHeight) * 2 + 1;
+      this._checkHover();
     });
+
+    addEventListener("click", (event) => {
+      this._handleClick();
+    });
+
+    // Add touch support for mobile
+    addEventListener("touchstart", (event) => {
+      if (event.touches.length === 1) {
+        const touch = event.touches[0];
+        this._mouse.x = (touch.clientX / innerWidth) * 2 - 1;
+        this._mouse.y = -(touch.clientY / innerHeight) * 2 + 1;
+        this._handleClick();
+      }
+    });
+  }
+
+  _checkHover() {
+    if (!this._camera || this._mouse.x === undefined) return;
+
+    this._raycaster.setFromCamera(this._mouse, this._camera);
+    const interactables = TextElements.getInteractableObjects();
+
+    if (interactables.length === 0) return;
+
+    const intersects = this._raycaster.intersectObjects(interactables, true);
+
+    if (intersects.length > 0) {
+      // Find the parent group
+      let object = intersects[0].object;
+      while (object.parent && !object.userData.isLinkedInIcon) {
+        object = object.parent;
+      }
+
+      if (object.userData.isLinkedInIcon && this._hoveredObject !== object) {
+        // Hover on
+        document.body.style.cursor = "pointer";
+        if (object.userData.glowMaterial) {
+          object.userData.glowMaterial.opacity = 0.7;
+        }
+        this._hoveredObject = object;
+      }
+    } else {
+      // Hover off
+      if (this._hoveredObject) {
+        document.body.style.cursor = "default";
+        if (this._hoveredObject.userData.glowMaterial) {
+          this._hoveredObject.userData.glowMaterial.opacity = 0;
+        }
+        this._hoveredObject = null;
+      }
+    }
+  }
+
+  _handleClick() {
+    if (!this._camera || this._mouse.x === undefined) return;
+
+    this._raycaster.setFromCamera(this._mouse, this._camera);
+    const interactables = TextElements.getInteractableObjects();
+
+    if (interactables.length === 0) return;
+
+    const intersects = this._raycaster.intersectObjects(interactables, true);
+
+    if (intersects.length > 0) {
+      let object = intersects[0].object;
+      while (object.parent && !object.userData.isLinkedInIcon) {
+        object = object.parent;
+      }
+
+      if (object.userData.isLinkedInIcon && object.userData.url) {
+        window.open(object.userData.url, "_blank");
+      }
+    }
   }
 
   _LoadAnimatedModel() {
@@ -80,8 +155,6 @@ export class World {
       this._threejs.render(this._scene, this._camera);
       this._Step(currentTime - this._previousRAF);
       this._previousRAF = currentTime;
-
-      this._raycaster.setFromCamera(this._mouse, this._camera);
     });
   }
 
