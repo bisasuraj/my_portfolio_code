@@ -231,7 +231,7 @@ export class World {
   _addPhysicsBoxes() {
     // Add a box in front of where the character starts (0, 0, 0)
     // Position it a bit in front and to the side
-    const boxPosition = new THREE.Vector3(15, 10, 15);
+    const boxPosition = new THREE.Vector3(15, 20, 15);
     const boxSize = new THREE.Vector3(10, 10, 10);
 
     const boxData = this._physics.addBox(
@@ -239,9 +239,21 @@ export class World {
       boxSize,
       35,
       this._scene,
-      "DON'T\nCLICK/TOUCH\nME"
+      "DON'T\nDRAG\nME"
     );
-    console.log("Physics box added:", boxData);
+
+    const boxPosition2 = new THREE.Vector3(-45, 50, 15);
+    const boxSize2 = new THREE.Vector3(8, 8, 8);
+    
+    const boxData2 = this._physics.addBox(
+      boxPosition2,
+      boxSize2,
+      35,
+      this._scene,
+      "Hi again :)"
+    );
+
+    console.log("Physics boxes added:", boxData);
   }
 
   _OnWindowResize() {

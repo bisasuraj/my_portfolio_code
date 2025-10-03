@@ -26,12 +26,11 @@ export class TextElements {
       opacity: 0.8,
       side: THREE.DoubleSide,
     });
+const message = "Welcome I’m thrilled to have you here! \n\n" +
+                "I’m a full-stack software engineer with hands-on experience building scalable, user-focused solutions. " +
+                "Currently at KAL, I work on complex C# systems for global ATM software, where I’ve streamlined debugging, improved testing, and delivered efficient solutions to recurring client issues. \n\n" +
+                "Beyond my professional work, I enjoy exploring data-driven projects like machine learning for day trading, and I’m always sharpening my skills in algorithms and system design to tackle challenges at scale. \n\n";  
 
-    const message = "Thrilled to have you here. \n\n" +
-                   "I'm a full-stack software developer with a love for crafting user-focused software that scales effortlessly. \n" +
-                   "With a wide range of skills and experience, I'm constantly driving improvements throughout the product lifecycle. \n" +
-                   "I can't wait to show you my professional and personal projects. \n" +
-                   "Let's dive in!";
 
     const shapes = font.generateShapes(message, 6);
     const geometry = new THREE.ShapeGeometry(shapes);
