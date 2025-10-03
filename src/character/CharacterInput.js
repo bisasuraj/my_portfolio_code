@@ -123,11 +123,13 @@ export class CharacterInput {
 
       // Touch events
       base.addEventListener("touchstart", onStart, { passive: false });
+      stick.addEventListener("touchstart", onStart, { passive: false });
       document.addEventListener("touchmove", onMove, { passive: false });
       document.addEventListener("touchend", onEnd, { passive: false });
 
       // Mouse events (for testing on desktop)
       base.addEventListener("mousedown", onStart);
+      stick.addEventListener("mousedown", onStart);
       document.addEventListener("mousemove", onMove);
       document.addEventListener("mouseup", onEnd);
     };
