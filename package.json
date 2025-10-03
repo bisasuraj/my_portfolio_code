@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@splinetool/loader": "^0.9.73",
+    "cannon-es": "^0.20.0",
     "three": "^0.137.5",
     "three-orbit-controls": "^82.1.0",
     "webpack": "^5.68.0"

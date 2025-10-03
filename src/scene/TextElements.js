@@ -96,12 +96,12 @@ static _createLinkedInSection(scene, font) {
   });
 
   const message = "Check out my LinkedIn here:";
-  const shapes = font.generateShapes(message, 3.5);
+  const shapes = font.generateShapes(message, 2.5);
   const textGeometry = new THREE.ShapeGeometry(shapes);
   const linkedInText = new THREE.Mesh(textGeometry, textMaterial);
 
   linkedInText.rotateY(30);
-  linkedInText.position.set(115, 30,40);
+  linkedInText.position.set(115, 30,50);
   scene.add(linkedInText);
 
   // Store reference for interaction

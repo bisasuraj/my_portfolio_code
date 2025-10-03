@@ -54,7 +54,7 @@ export class SceneSetup {
     scene.add(light);
 
     // Night sky gradient with richer colors
-    const skyGeometry = new THREE.SphereGeometry(500, 32, 32);
+    const skyGeometry = new THREE.SphereGeometry(600, 32, 32);
     const skyMaterial = new THREE.ShaderMaterial({
       uniforms: {
         topColor: { value: new THREE.Color(0x000814) },    // Deep midnight blue
