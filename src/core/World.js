@@ -194,18 +194,40 @@ export class World {
     this._raycaster.setFromCamera(this._mouse, this._camera);
     const interactables = TextElements.getInteractableObjects();
 
-    if (interactables.length === 0) return;
+    // Check if clicking on LinkedIn icon
+    if (interactables.length > 0) {
+      const intersects = this._raycaster.intersectObjects(interactables, true);
 
-    const intersects = this._raycaster.intersectObjects(interactables, true);
+      if (intersects.length > 0) {
+        let object = intersects[0].object;
+        while (object.parent && !object.userData.isLinkedInIcon) {
+          object = object.parent;
+        }
 
-    if (intersects.length > 0) {
-      let object = intersects[0].object;
-      while (object.parent && !object.userData.isLinkedInIcon) {
-        object = object.parent;
+        if (object.userData.isLinkedInIcon && object.userData.url) {
+          window.open(object.userData.url, "_blank");
+          return; // Don't enable camera if clicking on icon
+        }
       }
+    }
 
-      if (object.userData.isLinkedInIcon && object.userData.url) {
-        window.open(object.userData.url, "_blank");
+    // Check if clicking on physics objects
+    const physicsObjects = this._physics.getInteractableObjects();
+    if (physicsObjects.length > 0) {
+      const physicsIntersects = this._raycaster.intersectObjects(physicsObjects, false);
+      if (physicsIntersects.length > 0) {
+        return; // Don't enable camera if clicking on physics object
+      }
+    }
+
+    // If we get here, clicked on empty space - enable free camera
+    if (this._thirdPersonCamera) {
+      console.log('DEBUG: Prototype methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(this._thirdPersonCamera)));
+
+      // Just check the property directly instead of calling method
+      if (!this._thirdPersonCamera._isPointerLocked) {
+        console.log('Clicked empty space - enabling free camera');
+        this._thirdPersonCamera.enablePointerLock();
       }
     }
   }
@@ -221,6 +243,7 @@ export class World {
     this._thirdPersonCamera = new ThirdPersonCamera({
       camera: this._camera,
       target: this._controls,
+      canvas: this._threejs.domElement, // Pass the canvas for pointer lock
     });
 
     // Add character physics collider after character is loaded
