@@ -27,9 +27,9 @@ export class TextElements {
       side: THREE.DoubleSide,
     });
 const message = "Welcome I’m thrilled to have you here! \n\n" +
-                "I’m a full-stack software engineer with hands-on experience building scalable, user-focused solutions. " +
+                "I’m a full-stack software engineer with hands-on experience building scalable, user-focused solutions. \n\n" +
                 "Currently at KAL, I work on complex C# systems for global ATM software, where I’ve streamlined debugging, improved testing, and delivered efficient solutions to recurring client issues. \n\n" +
-                "Beyond my professional work, I enjoy exploring data-driven projects like machine learning for day trading, and I’m always sharpening my skills in algorithms and system design to tackle challenges at scale. \n\n";  
+                "Beyond my professional work, I enjoy swimming, cooking, and really enjoyed working on this project. \n\n";  
 
 
     const shapes = font.generateShapes(message, 6);

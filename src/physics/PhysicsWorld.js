@@ -171,29 +171,56 @@ export class PhysicsWorld {
     }
   }
 
+  // Check if character can move to new position (raycast collision detection)
+  checkCharacterCollision(body, character, newPosition) {
+    // Create ray from current position to new position
+    const from = body.position;
+    const to = new CANNON.Vec3(newPosition.x, newPosition.y + 1.2, newPosition.z);
+
+    const result = new CANNON.RaycastResult();
+    this.world.raycastClosest(from, to, {}, result);
+
+    // If ray hits something, don't allow movement
+    if (result.hasHit && result.body !== body) {
+      return false; // Collision detected
+    }
+    return true; // No collision
+  }
+
   // Sync character physics body with character position
   syncCharacterBody(body, character) {
     if (character._target) {
-      // Store previous position
+      // Store previous valid position
       if (!body.previousPosition) {
         body.previousPosition = body.position.clone();
       }
 
       const oldPos = body.previousPosition.clone();
+      const newPos = character._target.position;
 
-      // Update position - match the radius (1.2)
-      body.position.x = character._target.position.x;
-      body.position.z = character._target.position.z;
-      body.position.y = character._target.position.y + 1.2;
+      // Check if new position would cause collision
+      const canMove = this.checkCharacterCollision(body, character, newPos);
+
+      if (canMove) {
+        // No collision - allow movement
+        body.position.x = newPos.x;
+        body.position.z = newPos.z;
+        body.position.y = newPos.y + 1.2;
+
+        // Update previous position
+        body.previousPosition.copy(body.position);
+      } else {
+        // Collision detected - snap character back to physics body position
+        character._target.position.x = body.position.x;
+        character._target.position.z = body.position.z;
+        character._position.copy(character._target.position);
+      }
 
       // Calculate velocity for kinematic body
       const dt = 1.0 / 60.0;
       body.velocity.x = (body.position.x - oldPos.x) / dt;
       body.velocity.z = (body.position.z - oldPos.z) / dt;
       body.velocity.y = 0;
-
-      // Update previous position
-      body.previousPosition.copy(body.position);
     }
   }
 
