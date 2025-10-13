@@ -222,10 +222,11 @@ export class World {
 
     // If we get here, clicked on empty space - enable free camera
     if (this._thirdPersonCamera) {
-      console.log('DEBUG: Prototype methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(this._thirdPersonCamera)));
-
-      // Just check the property directly instead of calling method
-      if (!this._thirdPersonCamera._isPointerLocked) {
+      // Toggle pointer lock on/off with each click
+      if (this._thirdPersonCamera.isPointerLocked()) {
+        console.log('Clicked again - disabling free camera');
+        this._thirdPersonCamera.disablePointerLock();
+      } else {
         console.log('Clicked empty space - enabling free camera');
         this._thirdPersonCamera.enablePointerLock();
       }

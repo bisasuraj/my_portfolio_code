@@ -90,6 +90,14 @@ export class ThirdPersonCamera {
     return this._isPointerLocked;
   }
 
+  // Public method to disable pointer lock
+  disablePointerLock() {
+    if (document.exitPointerLock) {
+      document.exitPointerLock();
+      console.log('Free camera disabled');
+    }
+  }
+
   _onPointerLockChange() {
     const canvas = this._params.canvas || document.body;
     this._isPointerLocked = document.pointerLockElement === canvas ||
@@ -97,7 +105,7 @@ export class ThirdPersonCamera {
                              document.webkitPointerLockElement === canvas;
 
     if (this._isPointerLocked) {
-      console.log('✓ Free camera ACTIVE - Move mouse to orbit. Press ESC to exit.');
+      console.log('✓ Free camera ACTIVE - Move mouse to orbit. Press ESC or click to exit.');
     } else {
       console.log('✗ Free camera DISABLED - Click empty space to enable');
     }
